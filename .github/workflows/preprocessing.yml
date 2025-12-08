@@ -25,7 +25,7 @@ jobs:
       - name: Run preprocessing script
         run: |
           cd preprocessing
-          python automate_Ahmad.py
+          python automate_agi.py
 
       - name: Upload preprocessed data
         uses: actions/upload-artifact@v4
