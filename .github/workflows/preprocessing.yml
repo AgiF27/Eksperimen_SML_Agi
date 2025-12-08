@@ -1,0 +1,36 @@
+name: Preprocess Telecom Churn Data
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy scikit-learn
+
+      - name: Run preprocessing script
+        run: |
+          cd preprocessing
+          python automate_Ahmad.py
+
+      - name: Upload preprocessed data
+        uses: actions/upload-artifact@v4
+        with:
+          name: preprocessed-data
+          path: |
+            preprocessing/train_preprocessed.csv
+            preprocessing/test_preprocessed.csv
