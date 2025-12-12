@@ -5,12 +5,17 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   preprocess:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python 3.12.7
         uses: actions/setup-python@v5
@@ -27,10 +32,10 @@ jobs:
           cd preprocessing
           python automate_agi.py
 
-      - name: Upload preprocessed data
-        uses: actions/upload-artifact@v4
-        with:
-          name: preprocessed-data
-          path: |
-            preprocessing/train_preprocessed.csv
-            preprocessing/test_preprocessed.csv
+      - name: Commit and Push Preprocessed Data
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add preprocessing/train_preprocessed.csv preprocessing/test_preprocessed.csv
+          git commit -m "Preprocessed data updated by CI" || echo "No changes to commit"
+          git push origin main

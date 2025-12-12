@@ -25,16 +25,13 @@ def add_features(df):
     return df
 
 def main():
-    # Load data
     train, test = load_data()
     
-    # Konversi boolean
     for df in [train, test]:
         df['Churn'] = df['Churn'].astype(int)
         df['International plan'] = df['International plan'].map({'Yes': 1, 'No': 0})
         df['Voice mail plan'] = df['Voice mail plan'].map({'Yes': 1, 'No': 0})
     
-    # Feature engineering
     train = add_features(train)
     test = add_features(test)
     
@@ -43,14 +40,12 @@ def main():
     state_test = encoder.transform(test[['State']])
     state_cols = [f"State_{cat}" for cat in encoder.categories_[0][1:]]
 
-    # Gabungkan ke dataframe
     train = pd.concat([train.reset_index(drop=True), pd.DataFrame(state_train, columns=state_cols)], axis=1)
     test = pd.concat([test.reset_index(drop=True), pd.DataFrame(state_test, columns=state_cols)], axis=1)
 
     train = train.drop(columns=['State'])
     test = test.drop(columns=['State'])
     
-    # Scaling
     scaler = StandardScaler()
     numeric_cols = [
         'Account length', 'Number vmail messages', 'Total minutes', 'Total calls',
@@ -59,7 +54,6 @@ def main():
     train[numeric_cols] = scaler.fit_transform(train[numeric_cols])
     test[numeric_cols] = scaler.transform(test[numeric_cols])
     
-    # Fitur berbasis statistik TRAIN
     charge_75 = np.percentile(train['Total charge'], 75)
     day_minutes_75 = np.percentile(train['Total day minutes'], 75)
     
@@ -68,7 +62,6 @@ def main():
     train['Day usage high'] = (train['Total day minutes'] > day_minutes_75).astype(int)
     test['Day usage high'] = (test['Total day minutes'] > day_minutes_75).astype(int)
     
-    # Hapus kolom rincian
     cols_to_drop = [
         'Total day minutes', 'Total eve minutes', 'Total night minutes', 'Total intl minutes',
         'Total day calls', 'Total eve calls', 'Total night calls', 'Total intl calls',
@@ -78,7 +71,6 @@ def main():
     train = train.drop(columns=cols_to_drop)
     test = test.drop(columns=cols_to_drop)
     
-    # Simpan
     train.to_csv("train_preprocessed.csv", index=False)
     test.to_csv("test_preprocessed.csv", index=False)
     print("Preprocessing selesai. File disimpan.")
