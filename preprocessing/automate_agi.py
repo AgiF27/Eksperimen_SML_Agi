@@ -34,14 +34,6 @@ def main():
     
     train = add_features(train)
     test = add_features(test)
-    
-    encoder = OneHotEncoder(drop='first', sparse_output=False)
-    state_train = encoder.fit_transform(train[['State']])
-    state_test = encoder.transform(test[['State']])
-    state_cols = [f"State_{cat}" for cat in encoder.categories_[0][1:]]
-
-    train = pd.concat([train.reset_index(drop=True), pd.DataFrame(state_train, columns=state_cols)], axis=1)
-    test = pd.concat([test.reset_index(drop=True), pd.DataFrame(state_test, columns=state_cols)], axis=1)
 
     train = train.drop(columns=['State'])
     test = test.drop(columns=['State'])
